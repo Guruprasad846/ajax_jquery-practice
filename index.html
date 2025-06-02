@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="example">
+        <button class="switch">
+            click me
+        </button>
+
+    </div>
+    <div class="status">
+
+    </div>
+    <div id="result">
+
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('#example').on("click", "button.switch", function () {
+                $.ajax('result.html', {
+                    beforeSend: function () {
+                        $(".status").text("loading")
+                    }
+                }).done(function (response) {
+                    $('#result').html(response)
+                }).fail(function (request, errorType, errorMessage) {
+                    alert(errorMessage);
+                    console.log(errorType)
+                }).always(function () {
+                    $(".status").text("completed");
+                })
+            })
+        })
+    </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+</body>
+
+</html>
