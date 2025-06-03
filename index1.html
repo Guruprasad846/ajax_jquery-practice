@@ -20,9 +20,37 @@
 </head>
 
 <body>
-    <div class="container recipe-container">
-        <!-- <div class="row justify-content-center row-1">
 
+
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary justify-content-center " style="padding-left:5%;">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center text-center" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 justify-content-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#recipe">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link cart" href="#cart">cart</a>
+                    </li>
+
+
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="container recipe-container" id="recipe">
+
+        <!-- 
             <div class="row row-1"></div>
             <div class="card" style="width: 18rem;">
                 <img src="..." class="card-img-top" alt="...">
@@ -33,8 +61,24 @@
                         content.</p>
                     <a href="#" class="btn btn-primary">Go somewhere</a>
                 </div>
-            </div>
-        </div> -->
+            </div> -->
+
+    </div>
+    <div class="container cart-container" id="cart">
+
+        <!-- 
+            <div class="row row-1"></div>
+            <div class="card" style="width: 18rem;">
+                <img src="..." class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Card title</h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                        card’s
+                        content.</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div> -->
+
     </div>
 
 
@@ -47,26 +91,27 @@
                 url: "https://forkify-api.herokuapp.com/api/v2/recipes?search=pizza&key=e2aff1e3-0951-4721-802c-a4954a04a28d",
                 cache: false,
                 data: dataString,
-                success: function (html) {
-
-                    let arr = [...html.data.recipes]
-                    let json_data = JSON.stringify(arr)
-                    // console.log(json_data)
-
+                beforeSend: function () {
+                    $(".row-1").text("...loading")
                 }
-            })
-            $.ajax("recipes.json", {
-                dataType: 'json',
-                contentType: 'application/json',
-                cache: false
 
+            }).fail(function (request, errorMessage, errorType) {
+                alert(errorMessage)
             }).done(function (response) {
+
+                $(".row").text("")
                 console.log(response)
-                let count = 3
+                let cart = [];
                 let row = 1;
+                let recipe_data = [...response.data.recipes]
                 let html = ''
                 let indexrow;
-                $.each(response, function (index, element) {
+                console.log(recipe_data)
+
+                $('.recipe-container').append('<div class="row mb-3 justify-content-center row-' + row + '"></div>')
+
+                $.each(recipe_data, function (index, element) {
+
                     html = '';
 
                     html += '<div class="col-md-3 my-3"'
@@ -77,23 +122,132 @@
                         .title + '</h5>'
                     html += ' <p class="card-text">Some quick example text to build on the card title and make up the bulk of the cards'
                     html += '   content.</p>'
-                    html += '<a href="#" class="btn btn-secondary">Add to cart</a>'
+                    html += '<a href="#" class="btn  btn-secondary item" data-user-id="' + index + '">Add to cart</a>'
                     html += ' </div >'
                     html += '</div >'
                     html += '</div >'
 
-                    $(".row-" + row).append(html)
+                    $(".recipe-container .row-" + row).append(html)
                     if ((index + 1) % 3 == 0) {
 
                         row++
-                        $('.container').append('<div class="row mb-3 justify-content-center row-' + row + '"></div>')
 
-                    } 1
+                        $('.recipe-container').append('<div class="row mb-3 justify-content-center row-' + row + '"></div>')
+                    }
 
                 })
 
+
+
+
+
+
+                $(".item").click(function () {
+                    let count = 0;
+                    let index = $(this).data("userId");
+                    cart.push(recipe_data[index])
+
+                    console.log(cart)
+
+
+
+
+
+
+                })
+                function display_cart(data) {
+                    $('.cart-container').append('<div class="row mb-3 justify-content-center row-' + row + '"></div>')
+
+                    $.each(data, function (index, element) {
+                        console.log(element.image_url)
+                        html = '';
+
+                        html += '<div class="col-md-3 my-3"'
+                        html += ' <div class="card" style="width: 18rem;">'
+                        html += ' <img src=' + element.image_url + ' class="card-img-top mb-2" alt="...">'
+                        html += '   <div class="card-body">'
+                        html += ' <h5 class="card-title">' + element
+                            .title + '</h5>'
+                        html += ' <p class="card-text">Some quick example text to build on the card title and make up the bulk of the cards'
+                        html += '   content.</p>'
+                        html += '<a href="#" class="btn  btn-secondary rem" data-user-id="' + index + '"id="button-' + index + '">remove item</a>'
+                        html += ' </div >'
+                        html += '</div >'
+                        html += '</div >'
+
+                        $(".cart-container .row-" + row).append(html)
+                        if ((index + 1) % 3 == 0) {
+
+                            row++
+                            $('.cart-container').append('<div class="row mb-3 justify-content-center row-' + row + '"></div>')
+
+                        }
+
+                    })
+
+                }
+                $(document).on('click', '.cart', function () {
+
+
+                    $(".recipe-container").hide();
+                    $(".cart-container").show()
+                    console.log(cart)
+                    if (cart.length == 0) {
+
+                        console.log(cart)
+                        let cart_message = '<h1 class="message">please add something</h1>'
+
+                        $(".cart-container .message").remove()
+                        $(".cart-container").append(cart_message)
+                    }
+                    else {
+
+                        $(".cart-container .message").remove()
+                        $(".cart-container .row").remove()
+
+                        row = 1;
+                        display_cart(cart)
+                    }
+
+
+                })
+
+
+
+
+                $(".active").click(function () {
+
+                    $(".cart-container").hide()
+                    $(".recipe-container").show()
+
+                })
+
+                $(document).on('click', ".cart-container .rem", function () {
+                    let index = $(this).data("userId")
+                    cart.splice(index, 1)
+                    if (cart.length == 0) {
+                        $(".cart-container .row").remove()
+                        console.log(cart)
+
+
+
+                    }
+                    else {
+
+                        $(".cart-container .message").remove()
+                        $(".cart-container .row").remove()
+
+                        row = 1;
+                        display_cart(cart)
+
+                    }
+
+
+                });
+
             })
         })
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
